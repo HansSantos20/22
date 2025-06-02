@@ -41,7 +41,7 @@
       transition: width 0.5s ease-in-out;
     }
     .progress-bar.rockefeller { background: #e74c3c; }
-    .progress-bar.gephardt { background: #3498db; } /* Changed from .democrat to .gephardt */
+    .progress-bar.gephardt { background: #3498db; }
     .vote-label {
       position: absolute;
       color: white;
@@ -127,7 +127,7 @@
   <div class="candidate-stats">
     <div class="candidate-stat-left" id="rockefeller-pv">Rockefeller: 0 (0%)</div>
     <div class="stat-box" id="reporting">Reporting: 0%</div>
-    <div class="candidate-stat-right" id="gephardt-pv">Gephardt: 0 (0%)</div> <!-- Changed "Democrat" to "Gephardt" -->
+    <div class="candidate-stat-right" id="gephardt-pv">Gephardt: 0 (0%)</div>
   </div>
 </div>
 <div id="map"></div>
@@ -151,7 +151,7 @@
       const geojsonData = await res.json();
       console.log('GeoJSON Data Loaded:', geojsonData);
 
-      // Calculate election results
+      // Calculate election results, only counting states with 100% reporting
       let ev_rockefeller = 0;
       let ev_gephardt = 0;
       let total_gop_votes = 0;
@@ -168,10 +168,13 @@
         total_reporting += props.reporting || 0;
         state_count++;
 
-        if (props.winner === props.gop_candidate) {
-          ev_rockefeller += props.electoral_votes || 0;
-        } else if (props.winner === props.dem_candidate) {
-          ev_gephardt += props.electoral_votes || 0;
+        // Only count electoral votes if reporting is 100%
+        if (props.reporting === 100) {
+          if (props.winner === props.gop_candidate) {
+            ev_rockefeller += props.electoral_votes || 0;
+          } else if (props.winner === props.dem_candidate) {
+            ev_gephardt += props.electoral_votes || 0;
+          }
         }
       });
 
@@ -237,7 +240,7 @@
         const total = (p.votes_gop || 0) + (p.votes_dem || 0);
         const perc_gop = total > 0 ? ((p.votes_gop / total) * 100).toFixed(1) : 0;
         const perc_dem = total > 0 ? ((p.votes_dem / total) * 100).toFixed(1) : 0;
-        const winner = p.winner === 'UNKNOWN' ? 'Unknown' : p.winner;
+        const winner = p.winner === 'UNKNOWN' ? 'Uncalled' : p.winner;
 
         new mapboxgl.Popup()
           .setLngLat(e.lngLat)
@@ -246,7 +249,7 @@
             <b>Electoral Votes:</b> ${p.electoral_votes || 0}<br/>
             <b>Reporting:</b> ${p.reporting || 0}%<br/>
             <b>${p.gop_candidate || 'Rockefeller'}:</b> ${p.votes_gop.toLocaleString()} (${perc_gop}%)<br/>
-            <b>${p.dem_candidate || 'Gephardt'}:</b> ${p.votes_dem.toLocaleString()} (${perc_dem}%)<br/> <!-- Changed fallback from 'Democrat' to 'Gephardt' -->
+            <b>${p.dem_candidate || 'Gephardt'}:</b> ${p.votes_dem.toLocaleString()} (${perc_dem}%)<br/>
             <b>Winner:</b> ${winner}
           `)
           .addTo(map);
