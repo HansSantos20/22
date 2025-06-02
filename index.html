@@ -41,7 +41,7 @@
       transition: width 0.5s ease-in-out;
     }
     .progress-bar.rockefeller { background: #e74c3c; }
-    .progress-bar.gephardt { background: #3498db; }
+    .progress-bar.gephardt { background: #3498db; } /* Changed from .democrat to .gephardt */
     .vote-label {
       position: absolute;
       color: white;
@@ -127,7 +127,7 @@
   <div class="candidate-stats">
     <div class="candidate-stat-left" id="rockefeller-pv">Rockefeller: 0 (0%)</div>
     <div class="stat-box" id="reporting">Reporting: 0%</div>
-    <div class="candidate-stat-right" id="gephardt-pv">Gephardt: 0 (0%)</div>
+    <div class="candidate-stat-right" id="gephardt-pv">Gephardt: 0 (0%)</div> <!-- Changed "Democrat" to "Gephardt" -->
   </div>
 </div>
 <div id="map"></div>
@@ -168,13 +168,10 @@
         total_reporting += props.reporting || 0;
         state_count++;
 
-        // Only count electoral votes if reporting is 100%
-        if (props.reporting === 100) {
-          if (props.winner === props.gop_candidate) {
-            ev_rockefeller += props.electoral_votes || 0;
-          } else if (props.winner === props.dem_candidate) {
-            ev_gephardt += props.electoral_votes || 0;
-          }
+        if (props.winner === props.gop_candidate) {
+          ev_rockefeller += props.electoral_votes || 0;
+        } else if (props.winner === props.dem_candidate) {
+          ev_gephardt += props.electoral_votes || 0;
         }
       });
 
@@ -215,7 +212,7 @@
             'DEM Win', '#0e47e6',
             'Lean DEM', '#6c89d9',
             'Uncalled', '#cccccc',
-            '#ffffff'
+            '#ffffff' // Fallback color if status doesn't match
           ],
           'fill-opacity': 0.7
         }
@@ -244,12 +241,12 @@
 
         new mapboxgl.Popup()
           .setLngLat(e.lngLat)
-          . naiveHTML(`
+          .setHTML(`
             <strong>${p.NAME}</strong><br/>
             <b>Electoral Votes:</b> ${p.electoral_votes || 0}<br/>
             <b>Reporting:</b> ${p.reporting || 0}%<br/>
             <b>${p.gop_candidate || 'Rockefeller'}:</b> ${p.votes_gop.toLocaleString()} (${perc_gop}%)<br/>
-            <b>${p.dem_candidate || 'Gephardt'}:</b> ${p.votes_dem.toLocaleString()} (${perc_dem}%)<br/>
+            <b>${p.dem_candidate || 'Gephardt'}:</b> ${p.votes_dem.toLocaleString()} (${perc_dem}%)<br/> <!-- Changed fallback from 'Democrat' to 'Gephardt' -->
             <b>Winner:</b> ${winner}
           `)
           .addTo(map);
