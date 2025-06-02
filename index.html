@@ -143,7 +143,7 @@
 
   map.on('load', async () => {
     try {
-      const res = await fetch('base states-with-results.geojson');
+      const res = await fetch('data/base-states-with-results.geojson');
       if (!res.ok) {
         throw new Error(`Failed to fetch GeoJSON: ${res.statusText}`);
       }
