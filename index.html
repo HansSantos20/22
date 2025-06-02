@@ -58,12 +58,13 @@
       z-index: 10;
     }
     .threshold-label {
-      position: absolute;
+      position: relative; /* Changed from absolute to relative */
       left: calc(270 / 538 * 100% - 20px);
-      top: -20px;
       color: white;
       font-size: 12px;
       font-weight: bold;
+      margin-bottom: 5px; /* Added spacing below the label */
+      text-align: left; /* Align to match the marker position */
     }
     .candidate-labels {
       display: flex;
@@ -113,13 +114,15 @@
     </div>
     <div class="progress-bar-container">
       <img src="images/Jay_Rockefeller_portrait (3).jpg" alt="Rockefeller" class="candidate-image">
-      <div class="progress-bar-wrapper">
-        <div class="threshold-marker"></div>
-        <div class="threshold-label">270 to Win</div>
-        <div class="progress-bar rockefeller" id="rockefeller-bar" style="width: 0%"></div>
-        <div class="progress-bar gephardt" id="gephardt-bar" style="width: 0%"></div>
-        <div class="vote-label" id="rockefeller-label" style="left: 5px">0</div>
-        <div class="vote-label" id="gephardt-label" style="right: 5px">0</div>
+      <div style="width: 100%; position: relative;">
+        <div class="threshold-label">270 to Win</div> <!-- Moved above the progress bar -->
+        <div class="progress-bar-wrapper">
+          <div class="threshold-marker"></div>
+          <div class="progress-bar rockefeller" id="rockefeller-bar" style="width: 0%"></div>
+          <div class="progress-bar gephardt" id="gephardt-bar" style="width: 0%"></div>
+          <div class="vote-label" id="rockefeller-label" style="left: 5px">0</div>
+          <div class="vote-label" id="gephardt-label" style="right: 5px">0</div>
+        </div>
       </div>
       <img src="images/Dick_Gephardt_portrait.jpg" alt="Gephardt" class="candidate-image">
     </div>
