@@ -241,6 +241,10 @@
         const perc_gop = total > 0 ? ((p.votes_gop / total) * 100).toFixed(1) : 0;
         const perc_dem = total > 0 ? ((p.votes_dem / total) * 100).toFixed(1) : 0;
         const winner = p.winner === 'UNKNOWN' ? 'Uncalled' : p.winner;
+        const gopCandidate = p.gop_candidate || 'Rockefeller';
+        const demCandidate = p.dem_candidate || 'Gephardt';
+        const gopCheck = winner === gopCandidate ? '✓ ' : '';
+        const demCheck = winner === demCandidate ? '✓ ' : '';
 
         new mapboxgl.Popup()
           .setLngLat(e.lngLat)
@@ -248,8 +252,8 @@
             <strong>${p.NAME}</strong><br/>
             <b>Electoral Votes:</b> ${p.electoral_votes || 0}<br/>
             <b>Reporting:</b> ${p.reporting || 0}%<br/>
-            <b>${p.gop_candidate || 'Rockefeller'}:</b> ${p.votes_gop.toLocaleString()} (${perc_gop}%)<br/>
-            <b>${p.dem_candidate || 'Gephardt'}:</b> ${p.votes_dem.toLocaleString()} (${perc_dem}%)<br/>
+            <b><span style="color: #d12c0f;">${gopCheck}${gopCandidate}</span>:</b> ${p.votes_gop.toLocaleString()} (${perc_gop}%)<br/>
+            <b><span style="color: #0e47e6;">${demCheck}${demCandidate}</span>:</b> ${p.votes_dem.toLocaleString()} (${perc_dem}%)<br/>
             <b>Winner:</b> ${winner}
           `)
           .addTo(map);
