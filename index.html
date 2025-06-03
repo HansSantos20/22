@@ -146,10 +146,9 @@
 
   map.on('load', async () => {
     try {
-const res = await fetch('https://script.google.com/macros/s/AKfycbzc8KuYqeWtKpTuydPzOWuOSNiL8oK_czDi2oJan2f7Sh3-DITDrVtfzL1Ce8ly008eVg/exec');
-const data = await res.json();
-console.log('GeoJSON received:', data);
-
+      const res = await fetch('https://script.google.com/macros/s/AKfycbzc8KuYqeWtKpTuydPzOWuOSNiL8oK_czDi2oJan2f7Sh3-DITDrVtfzL1Ce8ly008eVg/exec');
+      const data = await res.json();
+      console.log('GeoJSON received:', data);
 
       let ev_rockefeller = 0;
       let ev_gephardt = 0;
@@ -158,7 +157,7 @@ console.log('GeoJSON received:', data);
       let total_reporting = 0;
       let state_count = 0;
 
-      geojsonData.features.forEach(f => {
+      data.features.forEach(f => {
         const props = f.properties;
         if (props.abbr === 'PR') return;
 
@@ -197,7 +196,7 @@ console.log('GeoJSON received:', data);
 
       map.addSource('states', {
         type: 'geojson',
-        data: geojsonData
+        data: data
       });
 
       map.addLayer({
