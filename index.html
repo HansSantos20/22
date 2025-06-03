@@ -185,13 +185,13 @@
 
       document.getElementById('rockefeller-votes').textContent = ev_rockefeller;
       document.getElementById('gephardt-votes').textContent = ev_gephardt;
-      document.getElementById('rockefeller-bar').style.width = ${(ev_rockefeller / 538) * 100}%;
-      document.getElementById('gephardt-bar').style.width = ${(ev_gephardt / 538) * 100}%;
+      document.getElementById('rockefeller-bar').style.width = `${(ev_rockefeller / 538) * 100}%`;
+      document.getElementById('gephardt-bar').style.width = `${(ev_gephardt / 538) * 100}%`;
       document.getElementById('rockefeller-label').textContent = ev_rockefeller;
       document.getElementById('gephardt-label').textContent = ev_gephardt;
-      document.getElementById('rockefeller-pv').textContent = Rockefeller: ${total_gop_votes.toLocaleString()} (${perc_gop}%);
-      document.getElementById('gephardt-pv').textContent = Gephardt: ${total_dem_votes.toLocaleString()} (${perc_dem}%);
-      document.getElementById('reporting').textContent = Reporting: ${avg_reporting}%;
+      document.getElementById('rockefeller-pv').textContent = `Rockefeller: ${total_gop_votes.toLocaleString()} (${perc_gop}%)`;
+      document.getElementById('gephardt-pv').textContent = `Gephardt: ${total_dem_votes.toLocaleString()} (${perc_dem}%)`;
+      document.getElementById('reporting').textContent = `Reporting: ${avg_reporting}%`;
 
       map.addSource('states', {
         type: 'geojson',
@@ -245,14 +245,14 @@
 
         new mapboxgl.Popup()
           .setLngLat(e.lngLat)
-          .setHTML(
+          .setHTML(`
             <strong>${p.NAME}</strong><br/>
             <b>Electoral Votes:</b> ${p.electoral_votes || 0}<br/>
             <b>Reporting:</b> ${p.reporting || 0}%<br/>
             <b><span style="color: #d12c0f;">${gopCheck}${gopCandidate}</span>:</b> ${gop_votes.toLocaleString()} (${perc_gop}%)<br/>
             <b><span style="color: #0e47e6;">${demCheck}${demCandidate}</span>:</b> ${dem_votes.toLocaleString()} (${perc_dem}%)<br/>
             <b>Winner:</b> ${winner}
-          )
+          `)
           .addTo(map);
       });
 
