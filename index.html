@@ -146,7 +146,7 @@
 
   map.on('load', async () => {
     try {
-      const res = await fetch('https://script.google.com/macros/s/AKfycbwdsOQCxJZ5SjoaM_jA5PMZJmxDdFH12_A09lkVpXQ2H6YTeHNjsR2QrhvAT943RJrpQQ/exec');
+      const res = await fetch('https://script.google.com/macros/s/AKfycbwgHvHWoZjxGg7HjyS3HANQnpXNRlCHU-wiFZKybGXcVXP5TuSqKfVjYwtGCHhGN2MM4g/exec');
       if (!res.ok) throw new Error(`Failed to fetch live data: ${res.statusText}`);
       const geojsonData = await res.json();
 
