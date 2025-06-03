@@ -181,8 +181,8 @@
 
       const perc_gop = total_votes > 0 ? ((total_gop_votes / total_votes) * 100).toFixed(1) : 0;
       const perc_dem = total_votes > 0 ? ((total_dem_votes / total_votes) * 100).toFixed(1) : 0;
-      const avg_reporting = total_votes > 0 ? (weighted_reporting_sum / total_votes) : 0;
 
+      // Set UI values
       document.getElementById('rockefeller-votes').textContent = ev_rockefeller;
       document.getElementById('gephardt-votes').textContent = ev_gephardt;
       document.getElementById('rockefeller-bar').style.width = `${(ev_rockefeller / 538) * 100}%`;
@@ -191,7 +191,10 @@
       document.getElementById('gephardt-label').textContent = ev_gephardt;
       document.getElementById('rockefeller-pv').textContent = `Rockefeller: ${total_gop_votes.toLocaleString()} (${perc_gop}%)`;
       document.getElementById('gephardt-pv').textContent = `Gephardt: ${total_dem_votes.toLocaleString()} (${perc_dem}%)`;
-      document.getElementById('reporting').textContent = `Reporting: ${Math.round(avg_reporting)}%`;
+
+      // Use the global reporting value from GeoJSON
+      const globalReporting = data.properties?.global_reporting || 0;
+      document.getElementById('reporting').textContent = `Reporting: ${Math.round(globalReporting)}%`;
 
       map.addSource('states', {
         type: 'geojson',
