@@ -151,38 +151,39 @@
       console.log('GeoJSON received:', data);
 
       let ev_rockefeller = 0;
-      let ev_gephardt = 0;
-      let total_gop_votes = 0;
-      let total_dem_votes = 0;
-      let total_reporting = 0;
-      let state_count = 0;
+let ev_gephardt = 0;
+let total_gop_votes = 0;
+let total_dem_votes = 0;
+let weighted_reporting_sum = 0;
+let total_votes = 0;
 
-      data.features.forEach(f => {
-        const props = f.properties;
-        if (props.abbr === 'PR') return;
+data.features.forEach(f => {
+  const props = f.properties;
+  if (props.abbr === 'PR') return;
 
-        const gop_votes = Number(props.votes_gop || 0);
-        const dem_votes = Number(props.votes_dem || 0);
-        const reporting = Number(props.reporting || 0);
+  const gop_votes = Number(props.votes_gop || 0);
+  const dem_votes = Number(props.votes_dem || 0);
+  const reporting = Number(props.reporting || 0);
+  const total = gop_votes + dem_votes;
 
-        total_gop_votes += gop_votes;
-        total_dem_votes += dem_votes;
-        total_reporting += reporting;
-        state_count++;
+  total_gop_votes += gop_votes;
+  total_dem_votes += dem_votes;
 
-        if (reporting === 100) {
-          if (props.winner === props.gop_candidate) {
-            ev_rockefeller += Number(props.electoral_votes || 0);
-          } else if (props.winner === props.dem_candidate) {
-            ev_gephardt += Number(props.electoral_votes || 0);
-          }
-        }
-      });
+  weighted_reporting_sum += reporting * total;
+  total_votes += total;
 
-      const total_votes = total_gop_votes + total_dem_votes;
-      const perc_gop = total_votes > 0 ? ((total_gop_votes / total_votes) * 100).toFixed(1) : 0;
-      const perc_dem = total_votes > 0 ? ((total_dem_votes / total_votes) * 100).toFixed(1) : 0;
-      const avg_reporting = state_count > 0 ? (total_reporting / state_count).toFixed(1) : 0;
+  if (reporting === 100) {
+    if (props.winner === props.gop_candidate) {
+      ev_rockefeller += Number(props.electoral_votes || 0);
+    } else if (props.winner === props.dem_candidate) {
+      ev_gephardt += Number(props.electoral_votes || 0);
+    }
+  }
+});
+
+const perc_gop = total_votes > 0 ? ((total_gop_votes / total_votes) * 100).toFixed(1) : 0;
+const perc_dem = total_votes > 0 ? ((total_dem_votes / total_votes) * 100).toFixed(1) : 0;
+const avg_reporting = total_votes > 0 ? (weighted_reporting_sum / total_votes).toFixed(1) : 0;
 
       document.getElementById('rockefeller-votes').textContent = ev_rockefeller;
       document.getElementById('gephardt-votes').textContent = ev_gephardt;
