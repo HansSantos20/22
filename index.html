@@ -144,6 +144,9 @@
     zoom: 3
   });
 
+  let prev_gop_votes = 0;
+  let prev_dem_votes = 0;
+
   map.on('load', async () => {
     try {
       const res = await fetch('https://script.google.com/macros/s/AKfycbzFWbDsXFOlHnpvAWTW1hmwCtf7eaSfjdWJPiOzvk5_7XTS0RNoWkBtzCMV2xer21XaHw/exec');
@@ -183,14 +186,30 @@
       const perc_dem = total_votes > 0 ? ((total_dem_votes / total_votes) * 100).toFixed(1) : 0;
       const avg_reporting = total_votes > 0 ? (weighted_reporting_sum / total_votes).toFixed(1) : 0;
 
+      const delta_gop = total_gop_votes - prev_gop_votes;
+      const delta_dem = total_dem_votes - prev_dem_votes;
+
+      const gop_trend = delta_gop === 0 ? '' :
+        (delta_gop > 0 ?
+          ` <span style="color: green;">🔺+${delta_gop.toLocaleString()}</span>` :
+          ` <span style="color: red;">🔻${Math.abs(delta_gop).toLocaleString()}</span>`);
+
+      const dem_trend = delta_dem === 0 ? '' :
+        (delta_dem > 0 ?
+          ` <span style="color: green;">🔺+${delta_dem.toLocaleString()}</span>` :
+          ` <span style="color: red;">🔻${Math.abs(delta_dem).toLocaleString()}</span>`);
+
+      prev_gop_votes = total_gop_votes;
+      prev_dem_votes = total_dem_votes;
+
       document.getElementById('rockefeller-votes').textContent = ev_rockefeller;
       document.getElementById('gephardt-votes').textContent = ev_gephardt;
       document.getElementById('rockefeller-bar').style.width = `${(ev_rockefeller / 538) * 100}%`;
       document.getElementById('gephardt-bar').style.width = `${(ev_gephardt / 538) * 100}%`;
       document.getElementById('rockefeller-label').textContent = ev_rockefeller;
       document.getElementById('gephardt-label').textContent = ev_gephardt;
-      document.getElementById('rockefeller-pv').textContent = `Rockefeller: ${total_gop_votes.toLocaleString()} (${perc_gop}%)`;
-      document.getElementById('gephardt-pv').textContent = `Gephardt: ${total_dem_votes.toLocaleString()} (${perc_dem}%)`;
+      document.getElementById('rockefeller-pv').innerHTML = `Rockefeller: ${total_gop_votes.toLocaleString()} (${perc_gop}%)${gop_trend}`;
+      document.getElementById('gephardt-pv').innerHTML = `Gephardt: ${total_dem_votes.toLocaleString()} (${perc_dem}%)${dem_trend}`;
       document.getElementById('reporting').textContent = `Reporting: ${avg_reporting}%`;
 
       map.addSource('states', {
