@@ -58,13 +58,13 @@
       z-index: 10;
     }
     .threshold-label {
-      position: relative; /* Changed from absolute to relative */
+      position: relative;
       left: calc(270 / 538 * 100% - 20px);
       color: white;
       font-size: 12px;
       font-weight: bold;
-      margin-bottom: 5px; /* Added spacing below the label */
-      text-align: left; /* Align to match the marker position */
+      margin-bottom: 5px;
+      text-align: left;
     }
     .candidate-labels {
       display: flex;
@@ -115,7 +115,7 @@
     <div class="progress-bar-container">
       <img src="images/Jay_Rockefeller_portrait (3).jpg" alt="Rockefeller" class="candidate-image">
       <div style="width: 100%; position: relative;">
-        <div class="threshold-label">270 to Win</div> <!-- Moved above the progress bar -->
+        <div class="threshold-label">270 to Win</div>
         <div class="progress-bar-wrapper">
           <div class="threshold-marker"></div>
           <div class="progress-bar rockefeller" id="rockefeller-bar" style="width: 0%"></div>
@@ -146,8 +146,8 @@
 
   map.on('load', async () => {
     try {
-      // Fetch GeoJSON data
-      const res = await fetch('data/base-states-with-results.geojson');
+      // Fetch GeoJSON data from Google Script URL
+      const res = await fetch('https://script.google.com/macros/s/AKfycbwdsOQCxJZ5SjoaM_jA5PMZJmxDdFH12_A09lkVpXQ2H6YTeHNjsR2QrhvAT943RJrpQQ/exec');
       if (!res.ok) {
         throw new Error(`Failed to fetch GeoJSON: ${res.statusText}`);
       }
@@ -281,4 +281,3 @@
 </script>
 </body>
 </html>
-
