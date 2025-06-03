@@ -58,13 +58,13 @@
       z-index: 10;
     }
     .threshold-label {
-      position: relative; /* Changed from absolute to relative */
+      position: relative;
       left: calc(270 / 538 * 100% - 20px);
       color: white;
       font-size: 12px;
       font-weight: bold;
-      margin-bottom: 5px; /* Added spacing below the label */
-      text-align: left; /* Align to match the marker position */
+      margin-bottom: 5px;
+      text-align: left;
     }
     .candidate-labels {
       display: flex;
@@ -115,7 +115,7 @@
     <div class="progress-bar-container">
       <img src="images/Jay_Rockefeller_portrait (3).jpg" alt="Rockefeller" class="candidate-image">
       <div style="width: 100%; position: relative;">
-        <div class="threshold-label">270 to Win</div> <!-- Moved above the progress bar -->
+        <div class="threshold-label">270 to Win</div>
         <div class="progress-bar-wrapper">
           <div class="threshold-marker"></div>
           <div class="progress-bar rockefeller" id="rockefeller-bar" style="width: 0%"></div>
@@ -146,15 +146,10 @@
 
   map.on('load', async () => {
     try {
-      // Fetch GeoJSON data
-      const res = await fetch('data/base-states-with-results.geojson');
-      if (!res.ok) {
-        throw new Error(`Failed to fetch GeoJSON: ${res.statusText}`);
-      }
+      const res = await fetch('https://script.google.com/macros/s/AKfycbwdsOQCxJZ5SjoaM_jA5PMZJmxDdFH12_A09lkVpXQ2H6YTeHNjsR2QrhvAT943RJrpQQ/exec');
+      if (!res.ok) throw new Error(`Failed to fetch live data: ${res.statusText}`);
       const geojsonData = await res.json();
-      console.log('GeoJSON Data Loaded:', geojsonData);
 
-      // Calculate election results, only counting states with 100% reporting
       let ev_rockefeller = 0;
       let ev_gephardt = 0;
       let total_gop_votes = 0;
@@ -164,19 +159,18 @@
 
       geojsonData.features.forEach(f => {
         const props = f.properties;
-        if (props.abbr === 'PR') return; // Skip Puerto Rico as it doesn't have electoral votes
+        if (props.abbr === 'PR') return;
 
-        total_gop_votes += props.votes_gop || 0;
-        total_dem_votes += props.votes_dem || 0;
-        total_reporting += props.reporting || 0;
+        total_gop_votes += Number(props.votes_gop || 0);
+        total_dem_votes += Number(props.votes_dem || 0);
+        total_reporting += Number(props.reporting || 0);
         state_count++;
 
-        // Only count electoral votes if reporting is 100%
-        if (props.reporting === 100) {
+        if (Number(props.reporting) === 100) {
           if (props.winner === props.gop_candidate) {
-            ev_rockefeller += props.electoral_votes || 0;
+            ev_rockefeller += Number(props.electoral_votes || 0);
           } else if (props.winner === props.dem_candidate) {
-            ev_gephardt += props.electoral_votes || 0;
+            ev_gephardt += Number(props.electoral_votes || 0);
           }
         }
       });
@@ -186,7 +180,6 @@
       const perc_dem = total_votes > 0 ? ((total_dem_votes / total_votes) * 100).toFixed(1) : 0;
       const avg_reporting = state_count > 0 ? (total_reporting / state_count).toFixed(1) : 0;
 
-      // Update UI with election results
       document.getElementById('rockefeller-votes').textContent = ev_rockefeller;
       document.getElementById('gephardt-votes').textContent = ev_gephardt;
       document.getElementById('rockefeller-bar').style.width = `${(ev_rockefeller / 538) * 100}%`;
@@ -197,14 +190,11 @@
       document.getElementById('gephardt-pv').textContent = `Gephardt: ${total_dem_votes.toLocaleString()} (${perc_dem}%)`;
       document.getElementById('reporting').textContent = `Reporting: ${avg_reporting}%`;
 
-      // Add GeoJSON source
       map.addSource('states', {
         type: 'geojson',
         data: geojsonData
       });
-      console.log('GeoJSON Source Added');
 
-      // Add fill layer
       map.addLayer({
         id: 'states-fill',
         type: 'fill',
@@ -218,14 +208,12 @@
             'DEM Win', '#0e47e6',
             'Lean DEM', '#6c89d9',
             'Uncalled', '#cccccc',
-            '#ffffff' // Fallback color if status doesn't match
+            '#ffffff'
           ],
           'fill-opacity': 0.7
         }
       });
-      console.log('Fill Layer Added');
 
-      // Add outline layer
       map.addLayer({
         id: 'states-outline',
         type: 'line',
@@ -235,12 +223,10 @@
           'line-width': 1
         }
       });
-      console.log('Outline Layer Added');
 
-      // Add click event for popups
       map.on('click', 'states-fill', (e) => {
         const p = e.features[0].properties;
-        const total = (p.votes_gop || 0) + (p.votes_dem || 0);
+        const total = Number(p.votes_gop || 0) + Number(p.votes_dem || 0);
         const perc_gop = total > 0 ? ((p.votes_gop / total) * 100).toFixed(1) : 0;
         const perc_dem = total > 0 ? ((p.votes_dem / total) * 100).toFixed(1) : 0;
         const winner = p.winner === 'UNKNOWN' ? 'Uncalled' : p.winner;
@@ -255,30 +241,26 @@
             <strong>${p.NAME}</strong><br/>
             <b>Electoral Votes:</b> ${p.electoral_votes || 0}<br/>
             <b>Reporting:</b> ${p.reporting || 0}%<br/>
-            <b><span style="color: #d12c0f;">${gopCheck}${gopCandidate}</span>:</b> ${p.votes_gop.toLocaleString()} (${perc_gop}%)<br/>
-            <b><span style="color: #0e47e6;">${demCheck}${demCandidate}</span>:</b> ${p.votes_dem.toLocaleString()} (${perc_dem}%)<br/>
+            <b><span style="color: #d12c0f;">${gopCheck}${gopCandidate}</span>:</b> ${Number(p.votes_gop).toLocaleString()} (${perc_gop}%)<br/>
+            <b><span style="color: #0e47e6;">${demCheck}${demCandidate}</span>:</b> ${Number(p.votes_dem).toLocaleString()} (${perc_dem}%)<br/>
             <b>Winner:</b> ${winner}
           `)
           .addTo(map);
       });
 
-      // Add hover effects
       map.on('mouseenter', 'states-fill', () => {
         map.getCanvas().style.cursor = 'pointer';
       });
+
       map.on('mouseleave', 'states-fill', () => {
         map.getCanvas().style.cursor = '';
       });
+
     } catch (error) {
       console.error('Error loading map:', error);
-      document.getElementById('map').innerHTML = '<p style="color: red; text-align: center;">Failed to load map. Please check the GeoJSON file or Mapbox token.</p>';
+      document.getElementById('map').innerHTML = '<p style="color: red; text-align: center;">Failed to load map. Please check the GeoJSON source or network connection.</p>';
     }
-  });
-
-  map.on('error', (e) => {
-    console.error('Mapbox Error:', e);
   });
 </script>
 </body>
 </html>
-
