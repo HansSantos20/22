@@ -149,14 +149,14 @@
       const res = await fetch('https://script.google.com/macros/s/AKfycbzFWbDsXFOlHnpvAWTW1hmwCtf7eaSfjdWJPiOzvk5_7XTS0RNoWkBtzCMV2xer21XaHw/exec');
       const data = await res.json();
 
-      const globalReporting = Number(data.properties?.global_reporting || 0);
+      // ✅ Set reporting value from top-level property
+      const globalReporting = data.properties?.global_reporting ?? 0;
       document.getElementById('reporting').textContent = `Reporting: ${Math.round(globalReporting)}%`;
 
       let ev_rockefeller = 0;
       let ev_gephardt = 0;
       let total_gop_votes = 0;
       let total_dem_votes = 0;
-      let total_votes = 0;
 
       data.features.forEach(f => {
         const props = f.properties;
@@ -164,14 +164,11 @@
 
         const gop_votes = Math.round(Number(props.votes_gop || 0));
         const dem_votes = Math.round(Number(props.votes_dem || 0));
-        const reporting = Number(props.reporting || 0);
-        const total = gop_votes + dem_votes;
 
         total_gop_votes += gop_votes;
         total_dem_votes += dem_votes;
-        total_votes += total;
 
-        if (reporting === 100) {
+        if (Number(props.reporting) === 100) {
           if (gop_votes > dem_votes) {
             ev_rockefeller += Number(props.electoral_votes || 0);
           } else if (dem_votes > gop_votes) {
@@ -180,6 +177,7 @@
         }
       });
 
+      const total_votes = total_gop_votes + total_dem_votes;
       const perc_gop = total_votes > 0 ? ((total_gop_votes / total_votes) * 100).toFixed(1) : 0;
       const perc_dem = total_votes > 0 ? ((total_dem_votes / total_votes) * 100).toFixed(1) : 0;
 
@@ -192,7 +190,10 @@
       document.getElementById('rockefeller-pv').textContent = `Rockefeller: ${total_gop_votes.toLocaleString()} (${perc_gop}%)`;
       document.getElementById('gephardt-pv').textContent = `Gephardt: ${total_dem_votes.toLocaleString()} (${perc_dem}%)`;
 
-      map.addSource('states', { type: 'geojson', data: data });
+      map.addSource('states', {
+        type: 'geojson',
+        data: data
+      });
 
       map.addLayer({
         id: 'states-fill',
