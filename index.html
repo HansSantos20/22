@@ -201,28 +201,29 @@
         source: 'states',
         paint: {
           'fill-color': [
-            'match',
-            ['get', 'status'],
-            'GOP Win', '#d12c0f',
-            'Lean GOP', '#de6954',
-            'DEM Win', '#0e47e6',
-            'Lean DEM', '#6c89d9',
-            'Uncalled', '#cccccc',
-            '#ffffff'
-          ],
+  'case',
+  ['==', ['get', 'status'], 'GOP Win'], '#d12c0f',
+  ['==', ['get', 'status'], 'Lean GOP'], '#de6954',
+  ['==', ['get', 'status'], 'DEM Win'], '#0e47e6',
+  ['==', ['get', 'status'], 'Lean DEM'], '#6c89d9',
+  ['==', ['get', 'status'], 'Uncalled'], '#cccccc',
+  '#ffffff' // fallback
+],
+
           'fill-opacity': 0.7
         }
       });
 
-      map.addLayer({
-        id: 'states-outline',
-        type: 'line',
-        source: 'states',
-        paint: {
-          'line-color': '#333',
-          'line-width': 1
-        }
-      });
+map.addLayer({
+  id: 'states-outline',
+  type: 'line',
+  source: 'states',
+  paint: {
+    'line-color': '#000000', // more contrast than #333
+    'line-width': 2           // make sure it's thick enough
+  }
+});
+
 
       map.on('click', 'states-fill', (e) => {
         const p = e.features[0].properties;
