@@ -9,7 +9,6 @@
   <style>
     body { margin: 0; padding: 0; font-family: sans-serif; }
     #map { position: absolute; top: 160px; bottom: 0; width: 100%; }
-
     #header {
       position: absolute;
       top: 0; left: 0; right: 0;
@@ -20,7 +19,6 @@
       flex-direction: column;
       align-items: center;
     }
-
     .progress-container {
       width: 100%;
       max-width: 800px;
@@ -28,7 +26,6 @@
       flex-direction: column;
       gap: 10px;
     }
-
     .progress-bar-wrapper {
       display: flex;
       align-items: center;
@@ -39,15 +36,12 @@
       border-radius: 10px;
       overflow: hidden;
     }
-
     .progress-bar {
       height: 100%;
       transition: width 0.5s ease-in-out;
     }
-
     .progress-bar.rockefeller { background: #e74c3c; }
     .progress-bar.gephardt { background: #3498db; }
-
     .vote-label {
       position: absolute;
       color: white;
@@ -55,7 +49,6 @@
       font-weight: bold;
       text-shadow: 0 0 2px rgba(0,0,0,0.7);
     }
-
     .threshold-marker {
       position: absolute;
       left: calc(270 / 538 * 100%);
@@ -64,7 +57,6 @@
       background: #fff;
       z-index: 10;
     }
-
     .threshold-label {
       position: relative;
       left: calc(270 / 538 * 100% - 20px);
@@ -74,7 +66,6 @@
       margin-bottom: 5px;
       text-align: left;
     }
-
     .candidate-labels {
       display: flex;
       justify-content: space-between;
@@ -82,23 +73,19 @@
       font-weight: bold;
       margin-bottom: 5px;
     }
-
     .stat-box { margin-top: 5px; font-size: 12px; }
-
     .candidate-image {
       width: 70px;
       height: 70px;
       border-radius: 50%;
       object-fit: cover;
     }
-
     .progress-bar-container {
       display: flex;
       align-items: center;
       width: 100%;
       gap: 15px;
     }
-
     .candidate-stats {
       display: flex;
       justify-content: space-between;
@@ -106,27 +93,14 @@
       max-width: 800px;
       font-size: 12px;
     }
-
     .candidate-stat-left, .candidate-stat-right {
       text-align: center;
       width: 150px;
     }
-
     .title {
       font-size: 30px;
       font-weight: bold;
       margin-bottom: 10px;
-    }
-
-    /* Fade-in animation for deltas */
-    .delta {
-      opacity: 0;
-      animation: fadeIn 0.5s ease-in forwards;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
     }
   </style>
 </head>
@@ -154,24 +128,14 @@
     </div>
   </div>
   <div class="candidate-stats">
-    <div class="candidate-stat-left" id="rockefeller-pv">
-      Rockefeller: <span id="rockefeller-pv-count">0</span> (<span id="rockefeller-pv-percent">0%</span>)
-      <span id="rockefeller-delta" style="margin-left: 5px;"></span>
-    </div>
+    <div class="candidate-stat-left" id="rockefeller-pv">Rockefeller: 0 (0%)</div>
     <div class="stat-box" id="reporting">Reporting: 0%</div>
-    <div class="candidate-stat-right" id="gephardt-pv">
-      Gephardt: <span id="gephardt-pv-count">0</span> (<span id="gephardt-pv-percent">0%</span>)
-      <span id="gephardt-delta" style="margin-left: 5px;"></span>
-    </div>
+    <div class="candidate-stat-right" id="gephardt-pv">Gephardt: 0 (0%)</div>
   </div>
 </div>
 <div id="map"></div>
-
 <script>
   mapboxgl.accessToken = 'pk.eyJ1IjoiNW00Y2s3NyIsImEiOiJjbWI4eXFqeDkwbzY1MmpwcDFzZDIwMmVqIn0.6JGe7JWhk28z5D3TLIJQwg';
-
-  let prevGopVotes = 0;
-  let prevDemVotes = 0;
 
   const map = new mapboxgl.Map({
     container: 'map',
@@ -221,44 +185,13 @@
 
       document.getElementById('rockefeller-votes').textContent = ev_rockefeller;
       document.getElementById('gephardt-votes').textContent = ev_gephardt;
-      document.getElementById('rockefeller-bar').style.width = `${(ev_rockefeller / 538) * 100}%`;
-      document.getElementById('gephardt-bar').style.width = `${(ev_gephardt / 538) * 100}%`;
+      document.getElementById('rockefeller-bar').style.width = ${(ev_rockefeller / 538) * 100}%;
+      document.getElementById('gephardt-bar').style.width = ${(ev_gephardt / 538) * 100}%;
       document.getElementById('rockefeller-label').textContent = ev_rockefeller;
       document.getElementById('gephardt-label').textContent = ev_gephardt;
-      document.getElementById('reporting').textContent = `Reporting: ${avg_reporting}%`;
-
-      document.getElementById('rockefeller-pv-count').textContent = total_gop_votes.toLocaleString();
-      document.getElementById('rockefeller-pv-percent').textContent = `${perc_gop}%`;
-      document.getElementById('gephardt-pv-count').textContent = total_dem_votes.toLocaleString();
-      document.getElementById('gephardt-pv-percent').textContent = `${perc_dem}%`;
-
-      // Show deltas if significant (>1000)
-      const deltaGop = total_gop_votes - prevGopVotes;
-      const deltaDem = total_dem_votes - prevDemVotes;
-
-      const gopDeltaEl = document.getElementById('rockefeller-delta');
-      const demDeltaEl = document.getElementById('gephardt-delta');
-
-      if (Math.abs(deltaGop) >= 1000) {
-        gopDeltaEl.innerHTML = `${deltaGop > 0 ? '🔺 +' : '🔻 '}${Math.abs(deltaGop).toLocaleString()}`;
-        gopDeltaEl.style.color = '#e74c3c';
-        gopDeltaEl.classList.add('delta');
-      } else {
-        gopDeltaEl.innerHTML = '';
-        gopDeltaEl.classList.remove('delta');
-      }
-
-      if (Math.abs(deltaDem) >= 1000) {
-        demDeltaEl.innerHTML = `${deltaDem > 0 ? '🔺 +' : '🔻 '}${Math.abs(deltaDem).toLocaleString()}`;
-        demDeltaEl.style.color = '#3498db';
-        demDeltaEl.classList.add('delta');
-      } else {
-        demDeltaEl.innerHTML = '';
-        demDeltaEl.classList.remove('delta');
-      }
-
-      prevGopVotes = total_gop_votes;
-      prevDemVotes = total_dem_votes;
+      document.getElementById('rockefeller-pv').textContent = Rockefeller: ${total_gop_votes.toLocaleString()} (${perc_gop}%);
+      document.getElementById('gephardt-pv').textContent = Gephardt: ${total_dem_votes.toLocaleString()} (${perc_dem}%);
+      document.getElementById('reporting').textContent = Reporting: ${avg_reporting}%;
 
       map.addSource('states', {
         type: 'geojson',
@@ -312,14 +245,14 @@
 
         new mapboxgl.Popup()
           .setLngLat(e.lngLat)
-          .setHTML(`
+          .setHTML(
             <strong>${p.NAME}</strong><br/>
             <b>Electoral Votes:</b> ${p.electoral_votes || 0}<br/>
             <b>Reporting:</b> ${p.reporting || 0}%<br/>
             <b><span style="color: #d12c0f;">${gopCheck}${gopCandidate}</span>:</b> ${gop_votes.toLocaleString()} (${perc_gop}%)<br/>
             <b><span style="color: #0e47e6;">${demCheck}${demCandidate}</span>:</b> ${dem_votes.toLocaleString()} (${perc_dem}%)<br/>
             <b>Winner:</b> ${winner}
-          `)
+          )
           .addTo(map);
       });
 
