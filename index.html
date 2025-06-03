@@ -148,43 +148,44 @@
     try {
       const res = await fetch('https://script.google.com/macros/s/AKfycbzFWbDsXFOlHnpvAWTW1hmwCtf7eaSfjdWJPiOzvk5_7XTS0RNoWkBtzCMV2xer21XaHw/exec');
       const data = await res.json();
-      console.log('GeoJSON received:', data);
 
       let ev_rockefeller = 0;
-let ev_gephardt = 0;
-let total_gop_votes = 0;
-let total_dem_votes = 0;
-let weighted_reporting_sum = 0;
-let total_votes = 0;
+      let ev_gephardt = 0;
+      let total_gop_votes = 0;
+      let total_dem_votes = 0;
+      let weighted_reporting_sum = 0;
+      let total_votes = 0;
 
-data.features.forEach(f => {
-  const props = f.properties;
-  if (props.abbr === 'PR') return;
+      data.features.forEach(f => {
+        const props = f.properties;
+        if (props.abbr === 'PR') return;
 
-  const gop_votes = Number(props.votes_gop || 0);
-  const dem_votes = Number(props.votes_dem || 0);
-  const reporting = Number(props.reporting || 0);
-  const total = gop_votes + dem_votes;
+        const gop_votes = Number(props.votes_gop || 0);
+        const dem_votes = Number(props.votes_dem || 0);
+        const reporting = Number(props.reporting || 0);
+        const total = gop_votes + dem_votes;
 
-  total_gop_votes += gop_votes;
-  total_dem_votes += dem_votes;
+        total_gop_votes += gop_votes;
+        total_dem_votes += dem_votes;
 
-  weighted_reporting_sum += reporting * total;
-  total_votes += total;
+        weighted_reporting_sum += reporting * total;
+        total_votes += total;
 
-  if (reporting === 100) {
-    if (props.winner === props.gop_candidate) {
-      ev_rockefeller += Number(props.electoral_votes || 0);
-    } else if (props.winner === props.dem_candidate) {
-      ev_gephardt += Number(props.electoral_votes || 0);
-    }
-  }
-});
+        // EV logic only if reporting is 100%
+        if (reporting === 100) {
+          if (gop_votes > dem_votes) {
+            ev_rockefeller += Number(props.electoral_votes || 0);
+          } else if (dem_votes > gop_votes) {
+            ev_gephardt += Number(props.electoral_votes || 0);
+          }
+        }
+      });
 
-const perc_gop = total_votes > 0 ? ((total_gop_votes / total_votes) * 100).toFixed(1) : 0;
-const perc_dem = total_votes > 0 ? ((total_dem_votes / total_votes) * 100).toFixed(1) : 0;
-const avg_reporting = total_votes > 0 ? (weighted_reporting_sum / total_votes).toFixed(1) : 0;
+      const perc_gop = total_votes > 0 ? ((total_gop_votes / total_votes) * 100).toFixed(1) : 0;
+      const perc_dem = total_votes > 0 ? ((total_dem_votes / total_votes) * 100).toFixed(1) : 0;
+      const avg_reporting = total_votes > 0 ? (weighted_reporting_sum / total_votes).toFixed(1) : 0;
 
+      // Update DOM
       document.getElementById('rockefeller-votes').textContent = ev_rockefeller;
       document.getElementById('gephardt-votes').textContent = ev_gephardt;
       document.getElementById('rockefeller-bar').style.width = `${(ev_rockefeller / 538) * 100}%`;
@@ -215,7 +216,7 @@ const avg_reporting = total_votes > 0 ? (weighted_reporting_sum / total_votes).t
             'Uncalled', '#cccccc',
             '#ffffff'
           ],
-          'fill-opacity': 0.7
+          'fill-opacity': 1.0
         }
       });
 
