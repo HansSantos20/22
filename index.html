@@ -146,9 +146,10 @@
 
   map.on('load', async () => {
     try {
-      const res = await fetch('https://script.google.com/macros/s/AKfycbwgHvHWoZjxGg7HjyS3HANQnpXNRlCHU-wiFZKybGXcVXP5TuSqKfVjYwtGCHhGN2MM4g/exec');
-      if (!res.ok) throw new Error(`Failed to fetch GeoJSON: ${res.statusText}`);
-      const geojsonData = await res.json();
+const res = await fetch('https://script.google.com/macros/s/AKfycbzc8KuYqeWtKpTuydPzOWuOSNiL8oK_czDi2oJan2f7Sh3-DITDrVtfzL1Ce8ly008eVg/exec');
+const data = await res.json();
+console.log('GeoJSON received:', data);
+
 
       let ev_rockefeller = 0;
       let ev_gephardt = 0;
