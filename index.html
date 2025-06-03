@@ -160,14 +160,13 @@
         const props = f.properties;
         if (props.abbr === 'PR') return;
 
-        const gop_votes = Number(props.votes_gop || 0);
-        const dem_votes = Number(props.votes_dem || 0);
+        const gop_votes = Math.round(Number(props.votes_gop || 0));
+        const dem_votes = Math.round(Number(props.votes_dem || 0));
         const reporting = Number(props.reporting || 0);
         const total = gop_votes + dem_votes;
 
         total_gop_votes += gop_votes;
         total_dem_votes += dem_votes;
-
         weighted_reporting_sum += reporting * total;
         total_votes += total;
 
@@ -231,8 +230,8 @@
       map.on('click', 'states-fill', (e) => {
         const p = e.features[0].properties;
 
-        const gop_votes = Number(p.votes_gop || 0);
-        const dem_votes = Number(p.votes_dem || 0);
+        const gop_votes = Math.round(Number(p.votes_gop || 0));
+        const dem_votes = Math.round(Number(p.votes_dem || 0));
         const total = gop_votes + dem_votes;
 
         const perc_gop = total > 0 ? ((gop_votes / total) * 100).toFixed(1) : 0;
