@@ -149,11 +149,13 @@
       const res = await fetch('https://script.google.com/macros/s/AKfycbzFWbDsXFOlHnpvAWTW1hmwCtf7eaSfjdWJPiOzvk5_7XTS0RNoWkBtzCMV2xer21XaHw/exec');
       const data = await res.json();
 
+      const globalReporting = Number(data.properties?.global_reporting || 0);
+      document.getElementById('reporting').textContent = `Reporting: ${Math.round(globalReporting)}%`;
+
       let ev_rockefeller = 0;
       let ev_gephardt = 0;
       let total_gop_votes = 0;
       let total_dem_votes = 0;
-      let weighted_reporting_sum = 0;
       let total_votes = 0;
 
       data.features.forEach(f => {
@@ -167,7 +169,6 @@
 
         total_gop_votes += gop_votes;
         total_dem_votes += dem_votes;
-        weighted_reporting_sum += reporting * total;
         total_votes += total;
 
         if (reporting === 100) {
@@ -182,7 +183,6 @@
       const perc_gop = total_votes > 0 ? ((total_gop_votes / total_votes) * 100).toFixed(1) : 0;
       const perc_dem = total_votes > 0 ? ((total_dem_votes / total_votes) * 100).toFixed(1) : 0;
 
-      // Set UI values
       document.getElementById('rockefeller-votes').textContent = ev_rockefeller;
       document.getElementById('gephardt-votes').textContent = ev_gephardt;
       document.getElementById('rockefeller-bar').style.width = `${(ev_rockefeller / 538) * 100}%`;
@@ -192,14 +192,7 @@
       document.getElementById('rockefeller-pv').textContent = `Rockefeller: ${total_gop_votes.toLocaleString()} (${perc_gop}%)`;
       document.getElementById('gephardt-pv').textContent = `Gephardt: ${total_dem_votes.toLocaleString()} (${perc_dem}%)`;
 
-      // Use the global reporting value from GeoJSON
-      const globalReporting = data.properties?.global_reporting || 0;
-      document.getElementById('reporting').textContent = `Reporting: ${Math.round(globalReporting)}%`;
-
-      map.addSource('states', {
-        type: 'geojson',
-        data: data
-      });
+      map.addSource('states', { type: 'geojson', data: data });
 
       map.addLayer({
         id: 'states-fill',
