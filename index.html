@@ -206,10 +206,13 @@ const avg_reporting = total_votes > 0 ? (weighted_reporting_sum / total_votes).t
         source: 'states',
         paint: {
           'fill-color': [
-            'case',
-            ['==', ['get', 'winner'], 'Rockefeller'], '#d12c0f',
-            ['==', ['get', 'winner'], 'Gephardt'], '#0e47e6',
-            ['==', ['get', 'winner'], 'UNKNOWN'], '#cccccc',
+            'match',
+            ['get', 'status'],
+            'GOP Win', '#d12c0f',
+            'DEM Win', '#0e47e6',
+            'Lean GOP', '#f4a6a6',
+            'Lean DEM', '#a6c8f4',
+            'Uncalled', '#cccccc',
             '#ffffff'
           ],
           'fill-opacity': 0.7
