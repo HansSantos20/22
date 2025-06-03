@@ -144,11 +144,15 @@
     zoom: 3
   });
 
-  map.on('load', async () => {
-    try {
-      const res = await fetch('https://script.google.com/macros/s/AKfycbwgHvHWoZjxGg7HjyS3HANQnpXNRlCHU-wiFZKybGXcVXP5TuSqKfVjYwtGCHhGN2MM4g/exec');
-      if (!res.ok) throw new Error(`Failed to fetch live data: ${res.statusText}`);
-      const geojsonData = await res.json();
+ map.on('load', async () => {
+  try {
+    // ✅ REPLACE WITH YOUR SCRIPT URL
+    const res = await fetch('https://script.google.com/macros/s/AKfycbwgHvHWoZjxGg7HjyS3HANQnpXNRlCHU-wiFZKybGXcVXP5TuSqKfVjYwtGCHhGN2MM4g/exec');
+    if (!res.ok) {
+      throw new Error(`Failed to fetch GeoJSON: ${res.statusText}`);
+    }
+    const geojsonData = await res.json();
+
 
       let ev_rockefeller = 0;
       let ev_gephardt = 0;
