@@ -8,12 +8,12 @@
   <link href="https://api.mapbox.com/mapbox-gl-js/v2.13.0/mapbox-gl.css" rel="stylesheet" />
   <style>
     body { margin: 0; padding: 0; font-family: sans-serif; }
-    #map { position: absolute; top: 160px; bottom: 0; width: 100%; }
+    #map { position: absolute; top: 220px; bottom: 0; width: 100%; }
     #header {
       position: absolute;
       top: 0; left: 0; right: 0;
       background: #222; color: white;
-      padding: 15px 20px;
+      padding: 20px 25px;
       z-index: 1000;
       display: flex;
       flex-direction: column;
@@ -21,19 +21,19 @@
     }
     .progress-container {
       width: 100%;
-      max-width: 800px;
+      max-width: 1000px;
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 15px;
     }
     .progress-bar-wrapper {
       display: flex;
       align-items: center;
       position: relative;
       width: 100%;
-      height: 20px;
+      height: 30px;
       background: #444;
-      border-radius: 10px;
+      border-radius: 15px;
       overflow: hidden;
     }
     .progress-bar {
@@ -45,38 +45,38 @@
     .vote-label {
       position: absolute;
       color: white;
-      font-size: 12px;
+      font-size: 16px;
       font-weight: bold;
       text-shadow: 0 0 2px rgba(0,0,0,0.7);
     }
     .threshold-marker {
       position: absolute;
       left: calc(270 / 538 * 100%);
-      width: 2px;
+      width: 3px;
       height: 100%;
       background: #fff;
       z-index: 10;
     }
     .threshold-label {
       position: relative;
-      left: calc(270 / 538 * 100% - 20px);
+      left: calc(270 / 538 * 100% - 30px);
       color: white;
-      font-size: 12px;
+      font-size: 16px;
       font-weight: bold;
-      margin-bottom: 5px;
+      margin-bottom: 8px;
       text-align: left;
     }
     .candidate-labels {
       display: flex;
       justify-content: space-between;
-      font-size: 14px;
+      font-size: 20px;
       font-weight: bold;
-      margin-bottom: 5px;
+      margin-bottom: 8px;
     }
-    .stat-box { margin-top: 5px; font-size: 12px; }
+    .stat-box { margin-top: 8px; font-size: 16px; }
     .candidate-image {
-      width: 70px;
-      height: 70px;
+      width: 100px;
+      height: 100px;
       border-radius: 50%;
       object-fit: cover;
     }
@@ -84,23 +84,23 @@
       display: flex;
       align-items: center;
       width: 100%;
-      gap: 15px;
+      gap: 20px;
     }
     .candidate-stats {
       display: flex;
       justify-content: space-between;
       width: 100%;
-      max-width: 800px;
-      font-size: 12px;
+      max-width: 1000px;
+      font-size: 16px;
     }
     .candidate-stat-left, .candidate-stat-right {
       text-align: center;
-      width: 150px;
+      width: 200px;
     }
     .title {
-      font-size: 30px;
+      font-size: 40px;
       font-weight: bold;
-      margin-bottom: 10px;
+      margin-bottom: 15px;
     }
   </style>
 </head>
@@ -120,8 +120,8 @@
           <div class="threshold-marker"></div>
           <div class="progress-bar rockefeller" id="rockefeller-bar" style="width: 0%"></div>
           <div class="progress-bar gephardt" id="gephardt-bar" style="width: 0%"></div>
-          <div class="vote-label" id="rockefeller-label" style="left: 5px">0</div>
-          <div class="vote-label" id="gephardt-label" style="right: 5px">0</div>
+          <div class="vote-label" id="rockefeller-label" style="left: 8px">0</div>
+          <div class="vote-label" id="gephardt-label" style="right: 8px">0</div>
         </div>
       </div>
       <img src="images/Dick_Gephardt_portrait.jpg" alt="Gephardt" class="candidate-image">
