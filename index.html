@@ -58,13 +58,13 @@
       z-index: 10;
     }
     .threshold-label {
-      position: relative; /* Changed from absolute to relative */
+      position: relative;
       left: calc(270 / 538 * 100% - 20px);
       color: white;
       font-size: 12px;
       font-weight: bold;
-      margin-bottom: 5px; /* Added spacing below the label */
-      text-align: left; /* Align to match the marker position */
+      margin-bottom: 5px;
+      text-align: left;
     }
     .candidate-labels {
       display: flex;
@@ -115,7 +115,7 @@
     <div class="progress-bar-container">
       <img src="images/Jay_Rockefeller_portrait (3).jpg" alt="Rockefeller" class="candidate-image">
       <div style="width: 100%; position: relative;">
-        <div class="threshold-label">270 to Win</div> <!-- Moved above the progress bar -->
+        <div class="threshold-label">270 to Win</div>
         <div class="progress-bar-wrapper">
           <div class="threshold-marker"></div>
           <div class="progress-bar rockefeller" id="rockefeller-bar" style="width: 0%"></div>
@@ -144,10 +144,11 @@
     zoom: 3
   });
 
-  map.on('load', async () => {
+  // Function to update the map and UI with new GeoJSON data
+  async function updateMapData() {
     try {
-      // Fetch GeoJSON data
-      const res = await fetch('data/base-states-with-results.geojson');
+      // Fetch GeoJSON data with cache-busting
+      const res = await fetch(`data/base-states-with-results.geojson?_=${new Date().getTime()}`);
       if (!res.ok) {
         throw new Error(`Failed to fetch GeoJSON: ${res.statusText}`);
       }
@@ -197,88 +198,100 @@
       document.getElementById('gephardt-pv').textContent = `Gephardt: ${total_dem_votes.toLocaleString()} (${perc_dem}%)`;
       document.getElementById('reporting').textContent = `Reporting: ${avg_reporting}%`;
 
-      // Add GeoJSON source
-      map.addSource('states', {
-        type: 'geojson',
-        data: geojsonData
-      });
-      console.log('GeoJSON Source Added');
+      // Update the map's GeoJSON source if it exists, or add it if it doesn't
+      if (map.getSource('states')) {
+        map.getSource('states').setData(geojsonData);
+        console.log('GeoJSON Source Updated');
+      } else {
+        map.addSource('states', {
+          type: 'geojson',
+          data: geojsonData
+        });
+        console.log('GeoJSON Source Added');
 
-      // Add fill layer
-      map.addLayer({
-        id: 'states-fill',
-        type: 'fill',
-        source: 'states',
-        paint: {
-          'fill-color': [
-            'match',
-            ['get', 'status'],
-            'GOP Win', '#d12c0f',
-            'Lean GOP', '#de6954',
-            'DEM Win', '#0e47e6',
-            'Lean DEM', '#6c89d9',
-            'Uncalled', '#cccccc',
-            '#ffffff' // Fallback color if status doesn't match
-          ],
-          'fill-opacity': 0.7
-        }
-      });
-      console.log('Fill Layer Added');
+        // Add fill layer
+        map.addLayer({
+          id: 'states-fill',
+          type: 'fill',
+          source: 'states',
+          paint: {
+            'fill-color': [
+              'match',
+              ['get', 'status'],
+              'GOP Win', '#d12c0f',
+              'Lean GOP', '#de6954',
+              'DEM Win', '#0e47e6',
+              'Lean DEM', '#6c89d9',
+              'Uncalled', '#cccccc',
+              '#ffffff' // Fallback color
+            ],
+            'fill-opacity': 0.7
+          }
+        });
+        console.log('Fill Layer Added');
 
-      // Add outline layer
-      map.addLayer({
-        id: 'states-outline',
-        type: 'line',
-        source: 'states',
-        paint: {
-          'line-color': '#333',
-          'line-width': 1
-        }
-      });
-      console.log('Outline Layer Added');
-
-      // Add click event for popups
-      map.on('click', 'states-fill', (e) => {
-        const p = e.features[0].properties;
-        const total = (p.votes_gop || 0) + (p.votes_dem || 0);
-        const perc_gop = total > 0 ? ((p.votes_gop / total) * 100).toFixed(1) : 0;
-        const perc_dem = total > 0 ? ((p.votes_dem / total) * 100).toFixed(1) : 0;
-        const winner = p.winner === 'UNKNOWN' ? 'Uncalled' : p.winner;
-        const gopCandidate = p.gop_candidate || 'Rockefeller';
-        const demCandidate = p.dem_candidate || 'Gephardt';
-        const gopCheck = winner === gopCandidate ? '✓ ' : '';
-        const demCheck = winner === demCandidate ? '✓ ' : '';
-
-        new mapboxgl.Popup()
-          .setLngLat(e.lngLat)
-          .setHTML(`
-            <strong>${p.NAME}</strong><br/>
-            <b>Electoral Votes:</b> ${p.electoral_votes || 0}<br/>
-            <b>Reporting:</b> ${p.reporting || 0}%<br/>
-            <b><span style="color: #d12c0f;">${gopCheck}${gopCandidate}</span>:</b> ${p.votes_gop.toLocaleString()} (${perc_gop}%)<br/>
-            <b><span style="color: #0e47e6;">${demCheck}${demCandidate}</span>:</b> ${p.votes_dem.toLocaleString()} (${perc_dem}%)<br/>
-            <b>Winner:</b> ${winner}
-          `)
-          .addTo(map);
-      });
-
-      // Add hover effects
-      map.on('mouseenter', 'states-fill', () => {
-        map.getCanvas().style.cursor = 'pointer';
-      });
-      map.on('mouseleave', 'states-fill', () => {
-        map.getCanvas().style.cursor = '';
-      });
+        // Add outline layer
+        map.addLayer({
+          id: 'states-outline',
+          type: 'line',
+          source: 'states',
+          paint: {
+            'line-color': '#333',
+            'line-width': 1
+          }
+        });
+        console.log('Outline Layer Added');
+      }
     } catch (error) {
-      console.error('Error loading map:', error);
-      document.getElementById('map').innerHTML = '<p style="color: red; text-align: center;">Failed to load map. Please check the GeoJSON file or Mapbox token.</p>';
+      console.error('Error updating map:', error);
     }
+  }
+
+  // Initial map load
+  map.on('load', () => {
+    updateMapData();
+
+    // Add click event for popups
+    map.on('click', 'states-fill', (e) => {
+      const p = e.features[0].properties;
+      const total = (p.votes_gop || 0) + (p.votes_dem || 0);
+      const perc_gop = total > 0 ? ((p.votes_gop / total) * 100).toFixed(1) : 0;
+      const perc_dem = total > 0 ? ((p.votes_dem / total) * 100).toFixed(1) : 0;
+      const winner = p.winner === 'UNKNOWN' ? 'Uncalled' : p.winner;
+      const gopCandidate = p.gop_candidate || 'Rockefeller';
+      const demCandidate = p.dem_candidate || 'Gephardt';
+      const gopCheck = winner === gopCandidate ? '✓ ' : '';
+      const demCheck = winner === demCandidate ? '✓ ' : '';
+
+      new mapboxgl.Popup()
+        .setLngLat(e.lngLat)
+        .setHTML(`
+          <strong>${p.NAME}</strong><br/>
+          <b>Electoral Votes:</b> ${p.electoral_votes || 0}<br/>
+          <b>Reporting:</b> ${p.reporting || 0}%<br/>
+          <b><span style="color: #d12c0f;">${gopCheck}${gopCandidate}</span>:</b> ${p.votes_gop.toLocaleString()} (${perc_gop}%)<br/>
+          <b><span style="color: #0e47e6;">${demCheck}${demCandidate}</span>:</b> ${p.votes_dem.toLocaleString()} (${perc_dem}%)<br/>
+          <b>Winner:</b> ${winner}
+        `)
+        .addTo(map);
+    });
+
+    // Add hover effects
+    map.on('mouseenter', 'states-fill', () => {
+      map.getCanvas().style.cursor = 'pointer';
+    });
+    map.on('mouseleave', 'states-fill', () => {
+      map.getCanvas().style.cursor = '';
+    });
+
+    // Start polling for updates every 10 seconds
+    setInterval(updateMapData, 10000);
   });
 
   map.on('error', (e) => {
     console.error('Mapbox Error:', e);
+    document.getElementById('map').innerHTML = '<p style="color: red; text-align: center;">Failed to load map. Please check the GeoJSON file or Mapbox token.</p>';
   });
 </script>
 </body>
 </html>
-
