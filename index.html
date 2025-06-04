@@ -39,14 +39,17 @@
     .progress-bar {
       height: 100%;
       transition: width 0.5s ease-in-out;
+      position: absolute;
+      top: 0;
     }
     .progress-bar.rockefeller {
       background: #e74c3c;
+      left: 0;
     }
     .progress-bar.gephardt {
       background: #3498db;
-      position: absolute;
       right: 0;
+      left: auto;
     }
     .vote-label {
       position: absolute;
@@ -54,6 +57,7 @@
       font-size: 12px;
       font-weight: bold;
       text-shadow: 0 0 2px rgba(0,0,0,0.7);
+      z-index: 2;
     }
     .threshold-marker {
       position: absolute;
