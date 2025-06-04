@@ -39,25 +39,15 @@
     .progress-bar {
       height: 100%;
       transition: width 0.5s ease-in-out;
-      position: absolute;
-      top: 0;
     }
-    .progress-bar.rockefeller {
-      background: #e74c3c;
-      left: 0;
-    }
-    .progress-bar.gephardt {
-      background: #3498db;
-      right: 0;
-      left: auto;
-    }
+    .progress-bar.rockefeller { background: #e74c3c; }
+    .progress-bar.gephardt { background: #3498db; }
     .vote-label {
       position: absolute;
       color: white;
       font-size: 12px;
       font-weight: bold;
       text-shadow: 0 0 2px rgba(0,0,0,0.7);
-      z-index: 2;
     }
     .threshold-marker {
       position: absolute;
@@ -163,7 +153,6 @@
       let ev_gephardt = 0;
       let total_gop_votes = 0;
       let total_dem_votes = 0;
-      let weighted_reporting_sum = 0;
       let total_votes = 0;
 
       data.features.forEach(f => {
@@ -177,7 +166,6 @@
 
         total_gop_votes += gop_votes;
         total_dem_votes += dem_votes;
-        weighted_reporting_sum += reporting * total;
         total_votes += total;
 
         if (reporting === 100) {
@@ -202,7 +190,7 @@
       document.getElementById('gephardt-label').textContent = ev_gephardt;
       document.getElementById('rockefeller-pv').textContent = `Rockefeller: ${total_gop_votes.toLocaleString()} (${perc_gop}%)`;
       document.getElementById('gephardt-pv').textContent = `Gephardt: ${total_dem_votes.toLocaleString()} (${perc_dem}%)`;
-      document.getElementById('reporting').textContent = `Reporting: ${avg_reporting}%`;
+      document.getElementById('reporting').textContent = `Reporting: ${reporting_pct}%`;
 
       map.addSource('states', {
         type: 'geojson',
@@ -283,3 +271,5 @@
 </script>
 </body>
 </html>
+
+
