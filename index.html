@@ -40,8 +40,14 @@
       height: 100%;
       transition: width 0.5s ease-in-out;
     }
-    .progress-bar.rockefeller { background: #e74c3c; }
-    .progress-bar.gephardt { background: #3498db; }
+    .progress-bar.rockefeller {
+      background: #e74c3c;
+    }
+    .progress-bar.gephardt {
+      background: #3498db;
+      position: absolute;
+      right: 0;
+    }
     .vote-label {
       position: absolute;
       color: white;
@@ -153,6 +159,7 @@
       let ev_gephardt = 0;
       let total_gop_votes = 0;
       let total_dem_votes = 0;
+      let weighted_reporting_sum = 0;
       let total_votes = 0;
 
       data.features.forEach(f => {
@@ -166,6 +173,7 @@
 
         total_gop_votes += gop_votes;
         total_dem_votes += dem_votes;
+        weighted_reporting_sum += reporting * total;
         total_votes += total;
 
         if (reporting === 100) {
@@ -177,10 +185,9 @@
         }
       });
 
-      const total_registered = 93204248;
-      const perc_gop = ((total_gop_votes / total_registered) * 100).toFixed(1);
-      const perc_dem = ((total_dem_votes / total_registered) * 100).toFixed(1);
-      const reporting_pct = ((total_votes / total_registered) * 100).toFixed(1);
+      const perc_gop = total_votes > 0 ? ((total_gop_votes / total_votes) * 100).toFixed(1) : 0;
+      const perc_dem = total_votes > 0 ? ((total_dem_votes / total_votes) * 100).toFixed(1) : 0;
+      const avg_reporting = total_votes > 0 ? (weighted_reporting_sum / total_votes).toFixed(1) : 0;
 
       document.getElementById('rockefeller-votes').textContent = ev_rockefeller;
       document.getElementById('gephardt-votes').textContent = ev_gephardt;
@@ -190,7 +197,7 @@
       document.getElementById('gephardt-label').textContent = ev_gephardt;
       document.getElementById('rockefeller-pv').textContent = `Rockefeller: ${total_gop_votes.toLocaleString()} (${perc_gop}%)`;
       document.getElementById('gephardt-pv').textContent = `Gephardt: ${total_dem_votes.toLocaleString()} (${perc_dem}%)`;
-      document.getElementById('reporting').textContent = `Reporting: ${reporting_pct}%`;
+      document.getElementById('reporting').textContent = `Reporting: ${avg_reporting}%`;
 
       map.addSource('states', {
         type: 'geojson',
