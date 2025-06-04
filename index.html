@@ -7,7 +7,7 @@
   <script src="https://api.mapbox.com/mapbox-gl-js/v2.13.0/mapbox-gl.js"></script>
   <link href="https://api.mapbox.com/mapbox-gl-js/v2.13.0/mapbox-gl.css" rel="stylesheet" />
   <style>
-    body { margin: 0; padding: 0; font-family: sans-serif; background: #222; color: white; }
+    body { margin: 0; padding: 0; font-family: sans-serif; }
     #map { position: absolute; top: 160px; bottom: 0; width: 100%; }
     #header {
       position: absolute;
@@ -27,6 +27,8 @@
       gap: 10px;
     }
     .progress-bar-wrapper {
+      display: flex;
+      align-items: center;
       position: relative;
       width: 100%;
       height: 20px;
@@ -34,20 +36,28 @@
       border-radius: 10px;
       overflow: hidden;
     }
-    .progress-bar-flex {
-      display: flex;
+    .progress-bar {
       height: 100%;
-      width: 100%;
+      transition: width 0.5s ease-in-out;
+      position: absolute;
+      top: 0;
     }
-    .bar-left {
+    .progress-bar.rockefeller {
       background: #e74c3c;
-      height: 100%;
-      transition: width 0.5s ease-in-out;
+      left: 0;
     }
-    .bar-right {
+    .progress-bar.gephardt {
       background: #3498db;
-      height: 100%;
-      transition: width 0.5s ease-in-out;
+      right: 0;
+      left: auto;
+    }
+    .vote-label {
+      position: absolute;
+      color: white;
+      font-size: 12px;
+      font-weight: bold;
+      text-shadow: 0 0 2px rgba(0,0,0,0.7);
+      z-index: 2;
     }
     .threshold-marker {
       position: absolute;
@@ -117,11 +127,11 @@
       <div style="width: 100%; position: relative;">
         <div class="threshold-label">270 to Win</div>
         <div class="progress-bar-wrapper">
-          <div class="progress-bar-flex">
-            <div class="bar-left" id="rockefeller-bar"></div>
-            <div class="bar-right" id="gephardt-bar"></div>
-          </div>
           <div class="threshold-marker"></div>
+          <div class="progress-bar rockefeller" id="rockefeller-bar" style="width: 0%"></div>
+          <div class="progress-bar gephardt" id="gephardt-bar" style="width: 0%"></div>
+          <div class="vote-label" id="rockefeller-label" style="left: 5px">0</div>
+          <div class="vote-label" id="gephardt-label" style="right: 5px">0</div>
         </div>
       </div>
       <img src="images/Dick_Gephardt_portrait.jpg" alt="Gephardt" class="candidate-image">
@@ -153,6 +163,7 @@
       let ev_gephardt = 0;
       let total_gop_votes = 0;
       let total_dem_votes = 0;
+      let weighted_reporting_sum = 0;
       let total_votes = 0;
 
       data.features.forEach(f => {
@@ -166,6 +177,7 @@
 
         total_gop_votes += gop_votes;
         total_dem_votes += dem_votes;
+        weighted_reporting_sum += reporting * total;
         total_votes += total;
 
         if (reporting === 100) {
@@ -184,16 +196,13 @@
 
       document.getElementById('rockefeller-votes').textContent = ev_rockefeller;
       document.getElementById('gephardt-votes').textContent = ev_gephardt;
+      document.getElementById('rockefeller-bar').style.width = `${(ev_rockefeller / 538) * 100}%`;
+      document.getElementById('gephardt-bar').style.width = `${(ev_gephardt / 538) * 100}%`;
+      document.getElementById('rockefeller-label').textContent = ev_rockefeller;
+      document.getElementById('gephardt-label').textContent = ev_gephardt;
       document.getElementById('rockefeller-pv').textContent = `Rockefeller: ${total_gop_votes.toLocaleString()} (${perc_gop}%)`;
       document.getElementById('gephardt-pv').textContent = `Gephardt: ${total_dem_votes.toLocaleString()} (${perc_dem}%)`;
-      document.getElementById('reporting').textContent = `Reporting: ${reporting_pct}%`;
-
-      const totalEV = ev_rockefeller + ev_gephardt;
-      const leftPct = totalEV > 0 ? (ev_rockefeller / totalEV) * 100 : 0;
-      const rightPct = totalEV > 0 ? (ev_gephardt / totalEV) * 100 : 0;
-
-      document.getElementById('rockefeller-bar').style.width = `${leftPct}%`;
-      document.getElementById('gephardt-bar').style.width = `${rightPct}%`;
+      document.getElementById('reporting').textContent = `Reporting: ${avg_reporting}%`;
 
       map.addSource('states', {
         type: 'geojson',
